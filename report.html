@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Report Title</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      color: #333;
+    }
+    header {
+      background: #007acc;
+      color: white;
+      padding: 20px 40px;
+      text-align: center;
+    }
+    nav {
+      background: #e9e9e9;
+      padding: 15px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav a {
+      margin-right: 15px;
+      text-decoration: none;
+      color: #007acc;
+      font-weight: bold;
+    }
+    section {
+      padding: 40px;
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    }
+    h2 {
+      color: #007acc;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #007acc;
+      color: white;
+      margin-top: 30px;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Optimized Path Planning using YOLO, ORB-SLAM3 and ADMM</h1>
+    <section id="team" style="padding: 2rem; font-family: Arial, sans-serif;">
+        <h2 style="text-align: center; color: #2c3e50;">👥 Team Members</h2>
+        <p style="text-align: center; color: #7f8c8d; font-size: 1rem; margin-bottom: 1.5rem;">
+          B.Tech Artificial Intelligence & Machine Learning — <strong>Batch B</strong>
+        </p>
+        <ul style="list-style: none; padding: 0; max-width: 600px; margin: auto; color: #34495e; font-size: 1.1rem;">
+          <li><strong>Kishore B</strong> – CB.SC.U4AIE23139</li>
+          <li><strong>Koushal Reddy M</strong> – CB.SC.U4AIE23145</li>
+          <li><strong>Naveen Babu M S</strong> – CB.SC.U4AIE23153</li>
+          <li><strong>Sai Charan M</strong> – CB.SC.U4AIE23143</li>
+        </ul>
+      </section>
+      
+      
+  </header>
+
+  <nav>
+    <a href="#abstract">Abstract</a>
+    <a href="#toc">Table of Contents</a>
+    <a href="#introduction">Introduction</a>
+    <a href="#literature">Literature Review</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#results">Results</a>
+    <a href="#demo">Demo</a>
+    <a href="#conclusion">Conclusion</a>
+    <a href="#future">Future Work</a>
+    <a href="#references">References</a>
+  </nav>
+
+  <section id="abstract">
+    <h2>Abstract</h2>
+    <p>
+      This project is about building an intelligent path planning system for autonomous vehicles. It combines computer vision techniques and optimization algorithms to make safe and smart driving decisions. We use YOLOv5, a deep learning model, to detect objects like cars and pedestrians in images. These objects are then tracked over time using SORT, which helps give each object a unique ID so we can follow them across frames.
+    </p>
+    <p>
+      For understanding the vehicle’s position and movement, we use ORB-SLAM3, which is a powerful tool for visual localization and 3D mapping. All this data comes from the KITTI dataset, which provides real-world driving scenes with stereo images.
+    </p>
+    <p>
+      After detecting and tracking the surrounding objects, we convert their positions from 2D image space into 3D coordinates using stereo vision. We also calculate their speed and distance from the vehicle. This gives us a full understanding of the vehicle’s environment in real time.
+    </p>
+    <p>
+      Using this data, we implement a path planning algorithm in MATLAB based on ADMM (Alternating Direction Method of Multipliers). This algorithm creates a smooth and safe path that avoids obstacles while following the rules of vehicle motion.
+    </p>
+    <p>
+      This project shows how different fields like deep learning, SLAM, and mathematical optimization can be combined to create an intelligent navigation system. Our final goal is to make autonomous driving safer and more reliable using real-world data and simulations.
+    </p>
+  </section>
+  
+  <section id="toc">
+    <h2>Table of Contents</h2>
+    <ol>
+      <li><a href="#abstract">Abstract</a></li>
+      <li><a href="#introduction">Introduction</a></li>
+      <li><a href="#literature">Literature Review / Related Work</a></li>
+      <li><a href="#methodology">Methodology & Implementation</a></li>
+      <li><a href="#results">Results and Discussion</a></li>
+      <li><a href="#demo">Demo of Simulation </a></li>
+      <li><a href="#conclusion">Conclusion</a></li>
+      <li><a href="#future">Future Work</a></li>
+      <li><a href="#references">References</a></li>
+    </ol>
+  </section>
+
+  <section id="introduction">
+    <h2>1. Introduction</h2>
+    <p>Autonomous vehicles are becoming one of the most exciting areas of research in robotics and artificial intelligence. For safe navigation in real-world environments, these vehicles must master three essential tasks: localization (determining their position), perception (understanding the surrounding environment), and path planning (deciding how to move safely).</p>
+
+    <p>This project integrates three core components: computer vision, object tracking, and mathematical optimization, to achieve efficient and safe path planning for autonomous vehicles.</p>
+
+    <p>We begin with <strong>YOLOv5</strong>, a deep learning-based object detection algorithm, to identify objects like cars, pedestrians, and bicycles in road scenes. YOLOv5 is known for its speed and ability to detect multiple objects per frame, making it ideal for real-time applications.</p>
+
+    <p>Object tracking is then implemented using <strong>SORT (Simple Online and Realtime Tracking)</strong>, which assigns a unique ID to each detected object and tracks its movement across frames. This process relies on the <strong>Kalman filter</strong> and a matching algorithm to maintain consistent object identification over time.</p>
+
+    <p>For localization, we use <strong>ORB-SLAM3</strong>, a state-of-the-art visual SLAM (Simultaneous Localization and Mapping) system that estimates the vehicle’s position and orientation from stereo images. ORB-SLAM3 also constructs a 3D map of the environment, enabling the vehicle to understand its movement relative to the world around it.</p>
+
+    <p>To integrate object tracking with the vehicle’s position data, we convert the 2D object detections into 3D coordinates using stereo vision principles. We estimate the velocity of each object and store this information for path planning.</p>
+
+    <p>For path planning, we use an <strong>optimization algorithm</strong> implemented in MATLAB with <strong>ADMM (Alternating Direction Method of Multipliers)</strong>. ADMM divides the planning problem into smaller, more manageable subproblems and solves them efficiently.</p>
+
+    <p>The final output is a <strong>collision-free trajectory</strong> that avoids both static and dynamic obstacles, while adhering to the vehicle’s motion constraints. The system is simulated using the <strong>KITTI dataset</strong>, which contains real-world driving data. The project also includes visualization tools that display the vehicle’s movement, detected obstacles, and the planned path from both a top-down and driver’s point of view.</p>
+  </section>
+
+  <section id="literature" style="padding: 2rem; font-family: Arial, sans-serif;">
+    <h2 style="text-align: center; color: #076ed4;"> Literature Review</h2>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse: collapse; margin-top: 1rem;">
+        <thead style="background-color: #006edb; color: white;">
+          <tr>
+            <th style="padding: 12px; border: 1px solid #ddd;">S.No</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">Authors & Year</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">Title of the Paper</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">Observation / Contribution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">1</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Mur-Artal et al., 2015</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">ORB-SLAM: A Versatile and Accurate Monocular SLAM System</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Introduced an efficient real-time SLAM method using ORB features; base inspiration for ORB-SLAM3.</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">2</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Bochkovskiy et al., 2020</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">YOLOv4: Optimal Speed and Accuracy of Object Detection</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Describes YOLO’s balance of speed and accuracy for real-time object detection; led to YOLOv5 use in this project.</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">3</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Bewley et al., 2016</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Simple Online and Realtime Tracking (SORT)</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Proposes a fast, effective tracking-by-detection algorithm using Kalman filtering and Hungarian matching.</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">4</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Geiger et al., 2012</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">The KITTI Vision Benchmark Suite</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Provides a standardized dataset for stereo vision, tracking, and SLAM; used in this project for testing.</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">5</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Kendall et al., 2017</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">End-to-End Learning of Geometry and Context for Deep Stereo Regression</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Shows how deep learning can outperform traditional stereo matching methods in terms of depth estimation.</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">6</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Boyd et al., 2011</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Distributed Optimization and Statistical Learning via ADMM</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Introduces ADMM – a robust optimization technique; applied in this project for trajectory planning.</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px; border: 1px solid #ddd;">7</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Ziebart et al., 2009</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Planning-Based Prediction for Pedestrian Path Prediction</td>
+            <td style="padding: 12px; border: 1px solid #ddd;">Highlights importance of semantic context and dynamic obstacles in planning – relevant for future improvements.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  
+
+<section id="methodology">
+    <h2>5. Methodology & Implementation</h2>
+
+    <h3>5.1 ORB-SLAM3 for Localization and Mapping</h3>
+    <p><strong>ORB-SLAM3</strong> (Oriented FAST and Rotated BRIEF Simultaneous Localization and Mapping) is one of the most advanced visual SLAM systems available today. It is designed to estimate the position and orientation of a moving camera in real time, using only visual input from either a monocular, stereo, or RGB-D camera. In our project, we use stereo image sequences from the <strong>KITTI Odometry Dataset</strong> as input to ORB-SLAM3.</p>
+    
+    <h4>What is SLAM?</h4>
+    <p>SLAM stands for Simultaneous Localization and Mapping. It’s like giving eyes and memory to a robot or vehicle. The goal is to help it understand where it is and what’s around it — at the same time.</p>
+    <p>Imagine a robot enters a room it has never seen before. It doesn’t have a map, and it doesn’t know where it is. As it moves around, it looks at its surroundings through a camera. Using that visual information:</p>
+    <ul>
+        <li>It builds a map of the environment (walls, objects, pathways, etc.)</li>
+        <li>At the same time, it figures out where it is inside that map</li>
+    </ul>
+    <p>This is SLAM — creating a map while also figuring out your own location in that map.</p>
+    <p>In our project, we use <strong>ORB-SLAM3</strong>, which does this using just images from a stereo camera. It finds unique features in the images, tracks how they move between frames, and uses that to estimate the camera’s movement and create a 3D map.</p>
+
+    <h4>ORB-SLAM3 Workflow Overview</h4>
+    <p>ORB-SLAM3 works by detecting features in camera images and matching them across frames. These feature points help to understand how the camera has moved between each frame. The main steps involved are:</p>
+    
+    <h5>1. Feature Detection</h5>
+    <p>ORB-SLAM3 uses ORB features, which consist of:</p>
+    <ul>
+        <li><strong>FAST (Features from Accelerated Segment Test)</strong>: for keypoint (corner) detection</li>
+        <li><strong>BRIEF (Binary Robust Independent Elementary Features)</strong>: for descriptor computation</li>
+    </ul>
+    <p>These features are rotation-invariant and efficient, making them suitable for real-time applications.</p>
+
+    <h5>2. Feature Matching</h5>
+    <p>ORB descriptors from one frame are matched with those from the next using Hamming distance (since BRIEF is a binary descriptor). These matches are used to estimate the relative motion.</p>
+
+    <h5>3. Pose Estimation</h5>
+    <p>Using the matched keypoints between stereo pairs and across time frames, ORB-SLAM3 estimates the Essential Matrix (E), depending on scene geometry. This is used to compute the camera's rotation (R) and translation (t) via epipolar geometry: after this one image tx is the skew-symmetric matrix of the translation vector. These transformations allow us to determine how the camera has moved from one frame to the next.</p>
+    <img src="images/Screenshot 2025-04-21 111359.png">
+    <h5>4. Map Creation</h5>
+    <p>Using stereo triangulation, 3D positions of feature points are computed and stored in a sparse 3D map. This helps in long-term localization.</p>
+
+    <h5>5. Loop Closure</h5>
+    <p>If the camera revisits a previously seen location, ORB-SLAM3 detects this and corrects accumulated drift by closing the loop, improving global consistency.</p>
+
+    <h5>6. Optimization</h5>
+    <p>Bundle Adjustment (BA) is performed to optimize both camera poses and 3D point positions by minimizing reprojection errors. This ensures high accuracy of the map and trajectory.</p>
+
+    <h4>Pose Output from ORB-SLAM3</h4>
+    <p>After running ORB-SLAM3 on the KITTI dataset, it gives us a camera trajectory in the form of 3D poses. These poses are typically represented as a 4×4 transformation matrix composed of a rotation matrix and a translation vector. However, the output is usually stored in a 3×4 format per timestamp, with one image per output.</p>
+    
+    <h5>Pose Matrix Format</h5>
+    <p>Each row in the output represents the camera's pose at a specific time and is in the following format:</p>
+    <img src="images/Screenshot 2025-04-21 111412.png">
+    <pre>
+        timestamp  r11  r12  r13  t1  r21  r22  r23  t2  r31  r32  r33  t3
+    </pre>
+    <p>Let’s break down what each part means:</p>
+    <ul>
+        <li><strong>timestamp:</strong> Time when the image/frame was captured.</li>
+        <li><strong>r11 to r33:</strong> The 3×3 rotation matrix that describes the orientation of the camera in 3D space.</li>
+        <li><strong>t1, t2, t3:</strong> The translation vector, which gives the camera's position in space (X, Y, Z coordinates).</li>
+    </ul>
+    <p>These values together form a 3×4 camera pose matrix. This matrix transforms a 3D point from the world coordinate system into the camera coordinate system, and vice versa when inverted.</p>
+
+    <h4>How We Use This Pose Data</h4>
+    <p>This pose data is very important for our project. It tells us exactly where the vehicle is at every moment in time, and which direction it is facing. This information is later used in multiple steps:</p>
+    <ul>
+        <li>To convert 2D object detections into 3D global positions</li>
+        <li>To estimate the vehicle's motion and direction</li>
+        <li>To plan a path in an ego-centric frame and then visualize it globally</li>
+        <li>To update the position of the ego-vehicle in each simulation step</li>
+    </ul>
+    <p>We also convert these rotation matrices to Euler angles or quaternions if needed for visualization or path planning.</p>
+
+    <h4>Summary</h4>
+    <p>ORB-SLAM3 gives us accurate and continuous localization data that plays a key role in building the foundation for perception and planning. Without knowing the position of the camera (or ego-vehicle), it would not be possible to transform 2D detections into 3D coordinates or to plan safe motion trajectories. This pose matrix is used throughout the pipeline — from object localization to the final trajectory planning and simulation in MATLAB.</p>
+
+</section>
+
+<section class="content-block">
+    <h2>5.2 Object Detection, Tracking, and 3D Position Estimation</h2>
+    <p>In autonomous navigation, it is important for a vehicle not only to know where it is but also to understand what it is around. This is known as perception. In our project, we use three main tools to handle this part:</p>
+    <ul>
+        <li>YOLOv5 for object detection</li>
+        <li>SORT for object tracking</li>
+        <li>Stereo vision for estimating how far the object is from the vehicle (depth estimation)</li>
+    </ul>
+    <p>These tools work together to give us a clear picture of all nearby moving objects, like other cars or pedestrians, and how they are changing over time. This information is very important for planning a safe and intelligent path.</p>
+</section>
+
+<section class="content-block">
+    <h3>YOLOv5 – Real-Time Object Detection</h3>
+    <p>YOLO stands for You Only Look Once, and it's a deep learning model designed for real-time object detection. Instead of scanning different parts of the image separately, YOLO looks at the entire image in one go and predicts:</p>
+    <ul>
+        <li>Where the objects are (bounding boxes)</li>
+        <li>What type of objects they are (class labels)</li>
+        <li>How confident it is about those predictions (confidence scores)</li>
+    </ul>
+    <p>This makes YOLO one of the fastest and most efficient object detectors.</p>
+    <h4>Why YOLOv5s?</h4>
+    <p>In our project, we used YOLOv5s, which is the smallest and fastest version of YOLOv5. It is ideal for real-time applications on limited hardware, like in autonomous driving simulations. We applied YOLOv5s on each left camera image from the KITTI Odometry dataset to detect surrounding vehicles.</p>
+    <p><strong>YOLOv5 Output:</strong></p>
+    <ul>
+        <li>Bounding Box Coordinates: (x1,y1) – top-left corner, (x2, y2) – bottom-right corner</li>
+        <li>Confidence Score: A value between 0 and 1 indicating how sure the model is about the object.</li>
+        <li>Class Label: Indicates the object category (e.g., car, pedestrian).</li>
+    </ul>
+</section>
+
+<section class="content-block">
+    <h3>YOLOv5 Inference Pipeline</h3>
+    <ol>
+        <li><strong>Image Preprocessing:</strong> Input image is resized to 640×640 pixels using the letterbox method (maintains aspect ratio with padding).</li>
+        <li><strong>Normalization:</strong> Pixel values are scaled to a range between 0 and 1.</li>
+        <li><strong>Forward Pass:</strong> The preprocessed image is passed through the YOLOv5 neural network.</li>
+        <li><strong>Thresholding:</strong> Predictions with confidence < 0.4 are discarded.</li>
+        <li><strong>Non-Maximum Suppression (NMS):</strong> When multiple boxes predict the same object, only the one with highest confidence is kept.</li>
+    </ol>
+</section>
+
+<section class="content-block">
+    <h3>SORT – Simple Object Tracking</h3>
+    <p>Once we have detected objects, we want to track them across multiple frames. SORT (Simple Online and Realtime Tracking) is used for this. It combines detection and tracking in a simple pipeline without using complex deep learning methods. It assigns a unique ID to each object and updates its location in every frame using predictions and matching techniques.</p>
+    <h4>How SORT Works – Step-by-Step</h4>
+    <ul>
+        <li><strong>Prediction using Kalman Filter:</strong> The Kalman Filter predicts the future position of an object based on its previous position and motion.</li>
+        <img src="images/Screenshot 2025-04-21 111424.png">
+        <li><strong>Data Association using Hungarian Algorithm:</strong> SORT matches new detections with predicted positions using IoU (Intersection over Union) as a similarity score.</li>
+        <img src="images/Screenshot 2025-04-21 111434.png">
+        <li><strong>Track Management:</strong> If a detection matches a previous object → retain the same ID. If a detection does not match → create a new track and assign a new ID. If a track is missing for several frames → it is deleted.</li>
+    </ul>
+</section>
+
+<section class="content-block">
+    <h3>Stereo Vision – Depth Estimation</h3>
+    <p>Stereo vision uses two images of the same scene — one from the left camera and one from the right camera. The difference in the position of an object in the two images is called disparity. The closer the object, the larger the disparity. This is used to estimate how far the object is from the vehicle.</p>
+    <h4>How We Calculate Depth:</h4>
+    <ol>
+        <li>Convert both left and right images to grayscale.</li>
+        <li>Use StereoSGBM (a stereo block matching algorithm from OpenCV) to compute a disparity map.</li>
+        <li>For each detected object, find the center point of its bounding box.</li>
+        <li>Get the disparity value at that point from the disparity map.</li>
+        <li>Use the formula to compute depth (Z).</li>
+    </ol>
+    <img src="images/Screenshot 2025-04-21 111440.png">
+</section>
+
+
+<section class="content-block">
+    <h3>Putting It All Together – Building a 3D Object Tracker</h3>
+    <p>Each object detected in a frame is now enriched with bounding box coordinates, a unique tracking ID, timestamp, disparity at the object’s center, and depth from stereo vision. This data is stored in two files:</p>
+    <ul>
+        <li>object_tracking.json: A flexible format for later use or visualization.</li>
+        <li>object_tracking.csv: A table format used in MATLAB for path planning.</li>
+    </ul>
+    <p>Here's an example record:</p>
+    <div class="code-example">
+        Timestamp | Frame ID | x1 | y1 | x2 | y2 | ID | Disparity | Depth (m) <br>
+        0.000 | 0 | 100 | 130 | 160 | 190 | 1 | 38.6 | 11.2
+    </div>
+</section>
+
+<section class="content-block">
+    <h3>Visualization and Output</h3>
+    <p>To verify the output and understand what’s happening, we draw the tracking results on each frame:</p>
+    <ul>
+        <li>Green rectangles show bounding boxes</li>
+        <li>The object’s ID and estimated depth are printed on top</li>
+        <li>The output is shown frame-by-frame in a live video window</li>
+    </ul>
+</section>
+
+<section class="content-block">
+    <h3>Why This Step Is Important</h3>
+    <p>This part of the project is the foundation for path planning. If we do not know where the obstacles are in 3D space, we cannot plan safe paths around them. By combining YOLO for object detection, SORT for object tracking, and stereo vision for 3D position, we create a rich and detailed picture of the environment that is both dynamic and spatially accurate.</p>
+</section>
+
+<section>
+    <h2>5.3 🔍 Converting 2D Object Detections into 3D World Coordinates</h2>
+    <p>
+      Once we detect and track objects in image frames and estimate their depth using stereo vision, the next step is to localize them in the real world.
+      This step is vital for enabling the vehicle to understand the position, size, and motion of obstacles in 3D space for safe navigation.
+    </p>
+  
+    <h3>A.  Camera Parameters and Stereo Geometry</h3>
+    <ul>
+      <li>Intrinsic parameters from the KITTI dataset’s projection matrix <code>P2</code> provide:
+        <ul>
+          <li><strong>fx, fy</strong>: focal lengths</li>
+          <li><strong>cx, cy</strong>: principal point (image center)</li>
+        </ul>
+        <img src="images/Screenshot 2025-04-21 111451.png" style="width: 200px;">
+      </li>
+      <li><strong>Baseline</strong>: Distance between left and right stereo cameras.</li>
+      <img src="images/Screenshot 2025-04-21 111457.png" style="width: 200px;">
+      <li>These values are used to convert 2D pixel coordinates into real-world 3D coordinates.</li>
+    </ul>
+  
+    <h3>B. 📐 Extracting 3D Object Size and Center</h3>
+    <p>From the cleaned tracking CSV (<code>object_tracking_cleaned.csv</code>):</p>
+    <ul>
+      <li>Each object has a bounding box: <code>x1, y1, x2, y2</code></li>
+      <li>Depth is estimated via stereo disparity</li>
+    </ul>
+    <p>We compute:</p>
+    <ul>
+      <li><strong>2D size</strong>: width = x2 − x1, height = y2 − y1</li>
+      <li><strong>3D size</strong>: projected using camera intrinsics and depth</li>
+      <img src="images/Screenshot 2025-04-21 111505.png" style="width: 200px;">
+      <li><strong>3D position (camera frame)</strong>: Center of the box is converted into world coordinates using projection formulas</li>
+      <img src="images/Screenshot 2025-04-21 111512.png" style="width: 200px;">
+    </ul>
+  
+    <h3>C. 🏃 Velocity Estimation</h3>
+    <ul>
+      <img src="images/Screenshot 2025-04-21 111518.png" style="width: 200px;">
+      <li>For each tracked object ID, previous 3D position and timestamp are stored</li>
+      <li>Velocity is calculated as distance / time difference</li>
+      <li>If it's the first time seeing the object, velocity is set to 0</li>
+    </ul>
+  
+    <h3>E. 📁 Final Output</h3>
+    <p>Results are stored in <code>object_tracking_3D.csv</code> with the following fields:</p>
+    <ul>
+      <li>Timestamp</li>
+      <li>Object ID</li>
+      <li>3D position: <code>X_ego, Y_ego, Z_ego</code></li>
+      <li>3D size: height and width</li>
+      <li>Depth</li>
+      <li>Velocity</li>
+      <li>Camera position (trajectory reference)</li>
+    </ul>
+  
+    <h3>F. 📌 Summary</h3>
+    <ul>
+      <li>Stereo depth provides distance to objects</li>
+      <li>2D bounding boxes locate size and image position</li>
+      <li>Camera pose gives a global reference</li>
+      <li>This step bridges perception and planning — critical for building safe autonomous navigation</li>
+    </ul>
+  </section>
+  
+
+
+<section>
+    <h1>ADMM-Based Trajectory Optimization – Overview and Workflow</h1>
+    <h2>What is Path Planning?</h2>
+    <p>Path planning is the process of finding a route from the vehicle’s current position to a goal point, while avoiding any obstacles like other cars or pedestrians. The path must also follow the rules of the vehicle’s movement. For example, a car cannot suddenly turn 90 degrees or jump over an object. The path must be realistic, continuous, and safe.</p>
+    <p>In this project, we use data from:</p>
+    <ul>
+        <li>The ORB-SLAM3 system, which gives us the vehicle’s location</li>
+        <li>The YOLO + SORT system, which tells us where the nearby objects are</li>
+        <li>Stereo vision, which gives us the depth (distance) of each object</li>
+    </ul>
+</section>
+
+<section class="step">
+    <h2>Overall Workflow – Step by Step</h2>
+    <p>Let's break down the entire MATLAB-based path planning process into simple steps:</p>
+    <ol>
+        <li><strong>Load Data from CSV Files</strong>: The system reads data from files like <em>object_tracking_3D.csv</em> and <em>CameraTrajectory.csv</em>, which contain positions, sizes, speeds, and SLAM-based positions.</li>
+        <li><strong>Convert to Ego-Centric Frame</strong>: All object positions are converted to a vehicle-centered reference frame.</li>
+        <li><strong>Define Vehicle and Planning Constraints</strong>: Parameters like maximum speed, turning radius, and safety margins are defined.</li>
+        <li><strong>Set Up the Optimization Problem</strong>: ADMM is used to break the problem into manageable parts: X-step (motion planning), Z-step (collision avoidance), and Lambda-update (balancing both).</li>
+        <li><strong>Simulate and Visualize the Path</strong>: The planned path is simulated and visualized in two views: driver view and top view.</li>
+    </ol>
+</section>
+
+<section class="step">
+    <h2>Why We Use ADMM</h2>
+    <p>ADMM is chosen because it:</p>
+    <ul>
+        <li>Works well with multiple constraints</li>
+        <li>Efficiently splits the problem into smaller parts</li>
+        <li>Can handle real-world nonlinear problems</li>
+        <li>Converges quickly to a good solution</li>
+    </ul>
+</section>
+
+<section class="step">
+    <h2>Final Output</h2>
+    <p>At the end of the planning process, we get:</p>
+    <ul>
+        <li>A smooth path from the current position to a goal point</li>
+        <li>A path that avoids all detected obstacles</li>
+        <li>Respect for real vehicle motion</li>
+        <li>Real-time visualization of the vehicle driving through the scene</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Files Used</h2>
+    <ul>
+        <li><strong>admm_planner.m</strong>: Main script running the ADMM-based path planner.</li>
+        <li><strong>admm_solver.m</strong>: Solves the optimization problem using ADMM.</li>
+        <li><strong>bicycle_model.m</strong>: Defines the kinematic bicycle model.</li>
+        <li><strong>bicycle_update.m</strong>: Updates the vehicle's state using the bicycle model equations.</li>
+        <li><strong>update_trajectory.m</strong>: Updates the trajectory over time.</li>
+        <li><strong>transform_obstacles.m</strong>: Transforms obstacle positions to the vehicle's frame.</li>
+        <li><strong>convert_to_global.m</strong>: Converts local coordinates to global ones.</li>
+    </ul>
+</section>
+
+<section class="params">
+    <h2>get_params.m – Parameter Descriptions</h2>
+    <pre>
+% General ADMM Parameters
+params.safe_distance       % Minimum distance from any obstacle
+params.horizon             % Number of steps in the planning horizon
+params.dt                  % Time step for planning
+params.max_iter            % Maximum number of iterations
+params.rho                 % ADMM penalty parameter
+params.tol                 % Convergence tolerance
+
+% Vehicle Parameters
+params.wheelbase           % Distance between axles
+params.max_steer           % Maximum steering angle
+params.max_speed           % Maximum speed of the vehicle
+params.L                   % Physical length of the vehicle
+params.W                   % Physical width of the vehicle
+
+% Obstacle Parameters
+params.obstacle.inflation      % Obstacle size inflation
+params.obstacle.safety_margin  % Safety margin
+
+% Cost Function Weights
+params.cost.goal            % Goal-following weight
+params.cost.control         % Control penalty weight
+params.cost.collision       % Collision avoidance weight
+    </pre>
+</section>
+
+<section>
+
+<h2>ADMM Optimization Objective – In Our Project</h2>
+    <p>
+        In our system, we use ADMM optimization for solving path planning or trajectory smoothing problems efficiently under constraints. 
+        The goal is to minimize an objective function (e.g., cost related to trajectory, smoothness, safety) while satisfying constraints 
+        like staying on the road or avoiding obstacles.
+    </p>
+
+    <!-- Image goes here -->
+    <img src="images/Screenshot 2025-04-20 174917.png" alt="ADMM Optimization Diagram">
+
+</section>
+
+<section style="padding: 40px; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+    <h2 style="color: #333; text-align: center;">Function: <code>get_obstacles.m</code></h2>
+    <p style="max-width: 800px; margin: 0 auto; line-height: 1.6; font-size: 16px;">
+        <strong>Purpose:</strong> This function reads a subset of object data (for the current timestamp) and formats the obstacle information for use in path planning. It returns a structured list of obstacles, each with its position, size, and velocity.
+    </p>
+
+    <h3 style="margin-top: 30px;">🧩 What It Does: Step-by-Step</h3>
+    <ul style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li><strong>Input:</strong> <code>data_subset</code> → a table that contains information about detected objects at a particular time step.</li>
+        <li><strong>Output:</strong> <code>obstacles</code> → an array of structs, where each struct represents one obstacle with:</li>
+        <ul>
+            <li><code>position</code>: 2D position in the ego vehicle's frame (X-Z plane).</li>
+            <li><code>size</code>: The width and depth of the object.</li>
+            <li><code>velocity</code>: The object's speed.</li>
+        </ul>
+    </ul>
+
+    <h3 style="margin-top: 30px;">🔍 Fields in the Output Struct</h3>
+    <ul style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li><code>obstacles(i).position</code> – [X, Z] coordinates of the object</li>
+        <li><code>obstacles(i).size</code> – [width, depth] of the object</li>
+        <li><code>obstacles(i).velocity</code> – Estimated velocity</li>
+    </ul>
+
+    <h3 style="margin-top: 30px;">📝 Summary</h3>
+    <table style="width: 80%; margin: 20px auto; border-collapse: collapse; font-size: 16px;">
+        <thead>
+            <tr style="background-color: #e0e0e0;">
+                <th style="padding: 10px; border: 1px solid #ccc;">Parameter</th>
+                <th style="padding: 10px; border: 1px solid #ccc;">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ccc;">position</td>
+                <td style="padding: 10px; border: 1px solid #ccc;">2D coordinates [X<sub>3D</sub>, Z<sub>3D</sub>] in ego-centric frame (KITTI-style)</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ccc;">size</td>
+                <td style="padding: 10px; border: 1px solid #ccc;">Size of the obstacle: [width, depth]</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ccc;">velocity</td>
+                <td style="padding: 10px; border: 1px solid #ccc;">Speed of the obstacle (for dynamic avoidance)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p style="max-width: 800px; margin: 20px auto 0 auto; font-size: 16px; line-height: 1.6;">
+        This function is typically called inside the main planning loop to identify current obstacles to be avoided in the next path segment.
+    </p>
+</section>
+
+<section style="padding: 40px; font-family: Arial, sans-serif; background-color: #ffffff;">
+    <h2 style="color: #333; text-align: center;">Function: <code>admm_solver.m</code></h2>
+    <p style="max-width: 800px; margin: 0 auto; line-height: 1.6; font-size: 16px;">
+        <strong>Purpose:</strong> This function implements the ADMM (Alternating Direction Method of Multipliers) algorithm to compute a collision-free, goal-oriented trajectory for the vehicle. It updates the trajectory iteratively while respecting dynamics and avoiding obstacles.
+    </p>
+
+    <h3 style="margin-top: 30px;">What It Does (Step-by-Step)</h3>
+    <ol style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li><strong>Initialization</strong>
+            <ul>
+                <li><strong>X:</strong> Initial guess for the vehicle trajectory (based on starting pose <code>x0</code>)</li>
+                <li><strong>U:</strong> Control input array (steering angle and acceleration)</li>
+                <li><strong>Z:</strong> Projected safe path (initially same as X)</li>
+                <li><strong>Lambda:</strong> Dual variable that tracks disagreement between X and Z</li>
+                <li>These variables are updated over several iterations.</li>
+            </ul>
+        </li>
+        <li><strong>ADMM Optimization Loop</strong> (Repeated for <code>params.max_iter</code> iterations)
+            <ul>
+                <li><strong>a. Trajectory Update (X)</strong>
+                    <ul>
+                        <li>Calls <code>update_trajectory()</code> to refine the path</li>
+                        <li>Ensures the new trajectory:
+                            <ul>
+                                <li>Follows vehicle dynamics</li>
+                                <li>Tries to reach the goal</li>
+                                <li>Minimizes control effort</li>
+                                <li>Stays close to the projected safe path (Z)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>b. Collision Projection (Z)</strong>
+                    <ul>
+                        <li>Calls <code>project_collision_constraints()</code></li>
+                        <li>Pushes trajectory points outside the danger zone to avoid obstacles</li>
+                    </ul>
+                </li>
+                <li><strong>c. Dual Variable Update (Lambda)</strong>
+                    <ul>
+                        <li>Updates Lambda to correct differences between X and Z</li>
+                        <li>Acts as a force to bring X and Z closer together over time</li>
+                    </ul>
+                </li>
+                <li><strong>d. Convergence Check</strong>
+                    <ul>
+                        <li>Stops the loop early if difference between X and Z is less than <code>params.tol</code></li>
+                        <li>This indicates convergence to a stable, optimal path</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ol>
+
+    <p style="max-width: 800px; margin: 20px auto 0 auto; font-size: 16px; line-height: 1.6;">
+         The <code>update_trajectory.m</code> function is a key component in this process, handling the actual update of the X variable with respect to all path planning constraints and goals.
+    </p>
+</section>
+
+<section style="padding: 40px; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+    <h2 style="color: #333; text-align: center;">Function: <code>collision_penalty.m</code></h2>
+    
+    <p style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <strong>Purpose:</strong> This function calculates a penalty cost if the planned trajectory gets too close to any obstacle.
+        It’s used within the ADMM optimization loop to discourage collisions by assigning extra cost when the vehicle enters a “danger zone” around obstacles.
+    </p>
+
+    <h3 style="margin-top: 30px;">🔍 What It Does — Step by Step</h3>
+    <ol style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li><strong>Inputs:</strong>
+            <ul>
+                <li><code>pos</code>: The current position of the ego-vehicle (e.g., [x, y] or [X, Z])</li>
+                <li><code>obstacles</code>: Matrix of obstacles with format [x, y, width, height] per row</li>
+                <li><code>params</code>: Includes the safety distance threshold</li>
+            </ul>
+        </li>
+        <li><strong>Initialize Total Cost</strong>
+            <ul>
+                <li>Set initial <code>cost = 0</code></li>
+                <li>Cost will accumulate based on proximity to obstacles</li>
+            </ul>
+        </li>
+        <li><strong>Loop Through All Obstacles</strong>
+            <ul>
+                <li>Extract center and half-sizes of the obstacle box</li>
+                <li>Calculate horizontal (<code>dx</code>) and vertical (<code>dy</code>) distances from obstacle edges</li>
+                <li>If vehicle is inside the box, <code>dx</code> or <code>dy</code> becomes 0 — indicating danger</li>
+            </ul>
+        </li>
+        <li><strong>Compute Euclidean Distance</strong>
+            <ul>
+                <li><code>distance = sqrt(dx² + dy²)</code></li>
+            </ul>
+        </li>
+        <li><strong>Add Penalty If Too Close</strong>
+            <ul>
+                <li>If <code>distance &lt; safety_distance</code>:
+                    <ul>
+                        <li>Add penalty cost based on how close the vehicle is</li>
+                        <li>The closer it is, the higher the penalty</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ol>
+</section>
+
+
+<section style="padding: 40px; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+    <h2 style="color: #333; text-align: center;">Function: <code>bicycle_model.m</code></h2>
+    
+    <p style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <strong>Purpose:</strong> This function uses a kinematic bicycle model to simulate how a vehicle moves over time, given its current position, speed, heading, and control inputs (acceleration and steering). It computes the next state of the vehicle.
+    </p>
+
+    <h3 style="margin-top: 30px;">🧠 What Is a Bicycle Model?</h3>
+    <p style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        The kinematic bicycle model is a simplified way of modeling how a car drives. It assumes the car behaves like a bicycle — with one front wheel and one rear wheel. It’s useful because:
+    </p>
+    <ul style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li>It captures realistic turning behavior</li>
+        <li>It’s simple and efficient for path planning</li>
+    </ul>
+
+    <h3 style="margin-top: 30px;">🔄 Step-by-Step Breakdown</h3>
+    <ol style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li><strong>Inputs:</strong>
+            <ul>
+                <li><code>current_state</code>: [x, z, θ, v]
+                    <ul>
+                        <li><code>x</code>: vehicle's current x-position</li>
+                        <li><code>z</code>: current z-position (forward direction in KITTI data)</li>
+                        <li><code>θ</code>: current heading angle (direction vehicle is facing)</li>
+                        <li><code>v</code>: current velocity (speed)</li>
+                    </ul>
+                </li>
+                <li><code>control</code>: [a, δ]
+                    <ul>
+                        <li><code>a</code>: acceleration (positive or negative)</li>
+                        <li><code>δ</code>: steering angle</li>
+                    </ul>
+                </li>
+                <li><code>params</code>: struct that includes:
+                    <ul>
+                        <li><code>dt</code>: time step</li>
+                        <li><code>wheelbase</code>: length between front and rear axles</li>
+                        <li><code>max_acc, max_steer</code>: limits</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Clipping Inputs:</strong>
+            <ul>
+                <li>The control inputs (<code>a</code>, <code>δ</code>) are clipped to stay within physical limits:
+                    <ul>
+                        <li>Maximum acceleration/deceleration</li>
+                        <li>Maximum steering angle</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Motion Equations:</strong> The next state is computed using the following equations:
+            <ul>
+                <li>The vehicle goes forward in the direction it's facing.</li>
+                <li>Turning affects the heading gradually.</li>
+                <li>Acceleration increases speed over time.</li>
+            </ul>
+        </li>
+        <li><strong>Output:</strong>
+            <ul>
+                <li>Returns the next state: [x_next, z_next, θ_next, v_next]</li>
+                <li>This is used in the planner to simulate how the car will move if it takes the given control action.</li>
+            </ul>
+        </li>
+    </ol>
+</section>
+
+<section style="padding: 40px; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+    <h2 style="color: #333; text-align: center;">Function: <code>bicycle_update.m</code></h2>
+    
+    <p style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <strong>Purpose:</strong> This function updates the vehicle’s state and control inputs (acceleration and steering) for the next time step. It does this by computing attractive and repulsive gradients — guiding the vehicle toward the goal while pushing it away from obstacles — and then applying the updated controls to simulate motion using a bicycle model.
+    </p>
+
+    <h3 style="margin-top: 30px;">What It Does</h3>
+    <p style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        This function performs gradient-based control:
+    </p>
+    <ul style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li>Pulls the vehicle toward the goal</li>
+        <li>Pushing the vehicle away from nearby obstacles</li>
+        <li>Updates the car’s next state based on the adjusted control</li>
+    </ul>
+
+    <h3 style="margin-top: 30px;">Step-by-Step Breakdown</h3>
+    <ol style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li><strong>Input Parameters:</strong>
+            <ul>
+                <li><code>x</code>: Current state [x, z, θ, v]
+                    <ul>
+                        <li><code>x</code>: Position (x, z)</li>
+                        <li><code>θ</code>: Heading angle</li>
+                        <li><code>v</code>: Speed</li>
+                    </ul>
+                </li>
+                <li><code>u</code>: Current control inputs [a, δ]
+                    <ul>
+                        <li><code>a</code>: Acceleration</li>
+                        <li><code>δ</code>: Steering angle</li>
+                    </ul>
+                </li>
+                <li><code>goal</code>: Desired final target position [x, z]</li>
+                <li><code>obstacles</code>: List of nearby obstacle positions [x, z]</li>
+                <li><code>params</code>: Contains vehicle constraints and tuning parameters like step size (<code>alpha_u</code>), max acceleration, max steering, etc.</li>
+            </ul>
+        </li>
+        <li><strong>Attractive Gradient Toward the Goal:</strong>
+            <ul>
+                <li>Calculates direction from current position to goal.</li>
+                <li>Computes a steering adjustment (<code>grad_goal_steer</code>) to align heading with the goal.</li>
+                <li>Computes an acceleration adjustment (<code>grad_goal_acc</code>) to reach maximum desired speed.</li>
+            </ul>
+        </li>
+        <li><strong>Repulsive Gradient from Obstacles:</strong>
+            <ul>
+                <li>For each obstacle, calculates how close it is to the vehicle.</li>
+                <li>If the vehicle is within a safety distance, apply a repulsive "force":
+                    <ul>
+                        <li>Pushing the vehicle to steer away from the obstacle</li>
+                        <li>Reducing speed if the vehicle is too close</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Combine Gradients and Update Control:</strong>
+            <ul>
+                <li>Combines goal and obstacle gradients into a total control gradient.</li>
+                <li>Applies a gradient descent step to the control input <code>u</code> using <code>params.alpha_u</code>.</li>
+                <li>Clips the updated controls to stay within physical limits (acceleration and steering angle).</li>
+            </ul>
+        </li>
+        <li><strong>Update Vehicle State (<code>x_next</code>):</strong>
+            <ul>
+                <li>Uses the bicycle model equations to compute the next position, heading, and velocity.</li>
+            </ul>
+        </li>
+    </ol>
+</section>
+
+<section style="padding: 40px; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+    <h2 style="color: #333; text-align: center;">Function: <code>bicycle_update.m</code></h2>
+    
+    <p style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <strong>Purpose:</strong> This function updates the vehicle’s state and control inputs (acceleration and steering) for the next time step. It does this by computing attractive and repulsive gradients — guiding the vehicle toward the goal while pushing it away from obstacles — and then applying the updated controls to simulate motion using a bicycle model.
+    </p>
+
+    <h3 style="margin-top: 30px;"> What It Does</h3>
+    <p style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        This function performs gradient-based control:
+    </p>
+    <ul style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li>Pulls the vehicle toward the goal</li>
+        <li>Pushing the vehicle away from nearby obstacles</li>
+        <li>Updates the car’s next state based on the adjusted control</li>
+    </ul>
+
+    <h3 style="margin-top: 30px;"> Step-by-Step Breakdown</h3>
+    <ol style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li><strong>Input Parameters:</strong>
+            <ul>
+                <li><code>x</code>: Current state [x, z, θ, v]
+                    <ul>
+                        <li><code>x</code>: Position (x, z)</li>
+                        <li><code>θ</code>: Heading angle</li>
+                        <li><code>v</code>: Speed</li>
+                    </ul>
+                </li>
+                <li><code>u</code>: Current control inputs [a, δ]
+                    <ul>
+                        <li><code>a</code>: Acceleration</li>
+                        <li><code>δ</code>: Steering angle</li>
+                    </ul>
+                </li>
+                <li><code>goal</code>: Desired final target position [x, z]</li>
+                <li><code>obstacles</code>: List of nearby obstacle positions [x, z]</li>
+                <li><code>params</code>: Contains vehicle constraints and tuning parameters like step size (<code>alpha_u</code>), max acceleration, max steering, etc.</li>
+            </ul>
+        </li>
+        <li><strong>Attractive Gradient Toward the Goal:</strong>
+            <ul>
+                <li>Calculates direction from current position to goal.</li>
+                <li>Computes a steering adjustment (<code>grad_goal_steer</code>) to align heading with the goal.</li>
+                <li>Computes an acceleration adjustment (<code>grad_goal_acc</code>) to reach maximum desired speed.</li>
+            </ul>
+        </li>
+        <li><strong>Repulsive Gradient from Obstacles:</strong>
+            <ul>
+                <li>For each obstacle, calculates how close it is to the vehicle.</li>
+                <li>If the vehicle is within a safety distance, apply a repulsive "force":
+                    <ul>
+                        <li>Pushing the vehicle to steer away from the obstacle</li>
+                        <li>Reducing speed if the vehicle is too close</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Combine Gradients and Update Control:</strong>
+            <ul>
+                <li>Combines goal and obstacle gradients into a total control gradient.</li>
+                <li>Applies a gradient descent step to the control input <code>u</code> using <code>params.alpha_u</code>.</li>
+                <li>Clips the updated controls to stay within physical limits (acceleration and steering angle).</li>
+            </ul>
+        </li>
+        <li><strong>Update Vehicle State (<code>x_next</code>):</strong>
+            <ul>
+                <li>Uses the bicycle model equations to compute the next position, heading, and velocity.</li>
+            </ul>
+        </li>
+    </ol>
+</section>
+
+<section style="padding: 40px; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+    <h2 style="color: #333; text-align: center;">Function: <code>project_collision_constraints.m</code></h2>
+    
+    <p style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <strong>Purpose:</strong> This function performs the Z-step of the ADMM optimization algorithm. It ensures that the planned trajectory does not intersect any obstacles by checking each trajectory point and, if necessary, pushing it outside any overlapping obstacle's bounding box using a safety margin.
+    </p>
+
+    <h3 style="margin-top: 30px;"> How It Works (Step-by-Step)</h3>
+    <ol style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li><strong>Initialize Z Trajectory:</strong>
+            <ul>
+                <li><code>Z = X(:,1:2) + Lambda;</code> 
+                    <ul>
+                        <li>Start by combining the current trajectory <code>X</code> with the ADMM dual variable <code>Lambda</code>.</li>
+                        <li>This gives the initial guess for a safe trajectory in 2D space ([x, z]).</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Loop Over Each Path Point and Obstacle:</strong>
+            <ul>
+                <li>For each point in the trajectory <code>Z</code>:</li>
+                <li>Check whether it lies inside any obstacle’s bounding box.</li>
+                <li>Obstacle position and size are used to define its bounding region.</li>
+                <li><code>dx = Z(k,1) - obs_pos(1);</code> and <code>dz = Z(k,2) - obs_pos(2);</code></li>
+                <li>Then use a simple axis-aligned bounding box (AABB) check:</li>
+                <li><code>if abs(dx) < obs_size(1)/2 && abs(dz) < obs_size(2)/2</code></li>
+                <li>This checks if the point is inside the rectangle defined by the obstacle.</li>
+            </ul>
+        </li>
+        <li><strong>Push the Point Out of the Obstacle:</strong>
+            <ul>
+                <li>If the point is inside:</li>
+                <li>Compute how deep it is inside the box in both x and z directions (<code>pen_x</code>, <code>pen_z</code>).</li>
+                <li>Then push it out along the shallower penetration direction:</li>
+                <li><code>if pen_x < pen_z</code> <code>Z(k,1) = obs_pos(1) + sign(dx)*(obs_size(1)/2 + safety_margin);</code></li>
+                <li><code>else</code> <code>Z(k,2) = obs_pos(2) + sign(dz)*(obs_size(2)/2 + safety_margin);</code></li>
+                <li>A safety margin is added to ensure the vehicle doesn't skim too close to the edge.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h3 style="margin-top: 30px;">Why This Step Is Important</h3>
+    <ul style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li>Ensures that the path remains collision-free regardless of how <code>X</code> evolves.</li>
+        <li>Efficiently handles complex scenes with multiple nearby obstacles.</li>
+        <li>Allows ADMM to focus separately on motion constraints (<code>X</code>) and safety constraints (<code>Z</code>).</li>
+    </ul>
+</section>
+
+<section style="padding: 40px; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+    <h2 style="color: #333; text-align: center;">Function: <code>Visualize Scene</code></h2>
+    
+    <p style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <strong>Purpose:</strong> This function is used to graphically display the result of the ADMM-based trajectory planning process. It provides a 2D visual representation of the vehicle’s motion, the planned path, and surrounding obstacles in the X-Z plane, which corresponds to the vehicle’s forward-facing frame.
+    </p>
+
+    <h3 style="margin-top: 30px;">What It Shows:</h3>
+    <ul style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li><strong>Planned Path:</strong>
+            <ul>
+                <li>The path generated by the ADMM algorithm that the vehicle intends to follow.</li>
+                <li>This path is usually smooth and optimized to avoid collisions and reach the goal efficiently.</li>
+            </ul>
+        </li>
+        <li><strong>Actual Vehicle Trajectory:</strong>
+            <ul>
+                <li>The true path the vehicle actually follows after applying control inputs through the vehicle model.</li>
+                <li>This may differ slightly from the planned path due to real-world motion dynamics or obstacle interference.</li>
+            </ul>
+        </li>
+        <li><strong>Vehicle Representation:</strong>
+            <ul>
+                <li>The vehicle’s current position and orientation are drawn in the scene to provide context for its direction and movement.</li>
+                <li>This helps in understanding how the vehicle aligns with the planned trajectory.</li>
+            </ul>
+        </li>
+        <li><strong>Obstacles:</strong>
+            <ul>
+                <li>All static or dynamic obstacles are shown as red boxes.</li>
+                <li>These include a visual safety margin (inflation) to make it easier to observe whether the vehicle is maintaining safe distances.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3 style="margin-top: 30px;"> Why This Visualization is Important:</h3>
+    <ul style="max-width: 800px; margin: 0 auto; font-size: 16px; line-height: 1.6;">
+        <li>It confirms whether the ADMM planner successfully avoids obstacles.</li>
+        <li>It shows how well the vehicle follows the path in realistic motion.</li>
+        <li>It gives a clear picture of how the planner performs in a crowded or dynamic environment.</li>
+        <li>It is useful for debugging, validation, and presentation of results.</li>
+    </ul>
+</section>
+
+<section id="results">
+    <h2>Results</h2>
+    <img src="images/Screenshot 2025-04-20 181557.png" alt="Results">
+
+</section>
+
+<section id="demo">
+    <h2>Demo Video: Trajectory Planning with Obstacle Avoidance</h2>
+    <video width="720" height="480" controls>
+      <source src="videos/WhatsApp Video 2025-04-20 at 18.36.34_3f7fcb7a.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <p>This video shows how the ADMM-based planner guides the vehicle along a smooth trajectory while avoiding obstacles in the X-Z plane.</p>
+</section>
+
+
+<section id="conclusion">
+    <h2> Conclusion and Discussion</h2>
+  
+    <p>
+      In this project, we successfully integrated multiple technologies to create a robust simulation framework for autonomous vehicle navigation.
+      Leveraging <strong>ORB-SLAM3</strong> for localization, <strong>YOLOv5 + SORT</strong> for real-time object detection and tracking, and a 
+      <strong>stereo vision system</strong> for depth estimation, we effectively perceived the environment using the <em>KITTI dataset</em>.
+    </p>
+  
+    <p>
+      We further processed the perception data to estimate <strong>3D positions, sizes, and velocities</strong> of surrounding objects 
+      in the ego-centric frame. This information was then fed into an <strong>ADMM-based trajectory planner</strong> (implemented in MATLAB) 
+      to compute safe and efficient paths for the autonomous vehicle within a dynamic environment.
+    </p>
+  
+    <hr>
+  
+    <h3> Results:</h3>
+    <ul>
+      <li>The planner generated <strong>smooth, realistic paths</strong> that effectively avoided both static and dynamic obstacles.</li>
+      <li>Integration of the <strong>kinematic bicycle model</strong> ensured the planned trajectories were feasible and physically accurate.</li>
+    </ul>
+  </section>
+  
+
+  <section id="future">
+    <h2> Future Work and Scope for Improvement</h2>
+  
+    <p>
+      While the current system demonstrates an effective approach to autonomous path planning using computer vision and optimization,
+      there are several areas where the project can be enhanced and expanded in future work.
+    </p>
+  
+    <hr>
+  
+    <h3> 1. Improved Depth Estimation Using Deep Learning</h3>
+    <p>
+      The current project uses classical stereo vision (disparity maps) for estimating object depth. Although effective, this method 
+      can be sensitive to lighting, texture, and occlusions. In the future, <strong>deep learning-based depth estimation</strong> can significantly 
+      improve accuracy and robustness.
+    </p>
+    <p>
+      Examples include: <em>MiDaS, Monodepth2, DPT</em> for monocular depth and <em>PSMNet, AnyNet</em> for stereo depth.
+      These methods can lead to <strong>better object localization</strong>, even in challenging real-world conditions, 
+      contributing to <strong>safer and more precise planning</strong>.
+    </p>
+  
+    <h3> 2. Integration of Semantic Understanding</h3>
+    <p>
+      Currently, the system treats all detected objects equally. In future work, adding <strong>semantic labels</strong> (e.g., car, pedestrian, cyclist) 
+      can help the planner behave more intelligently.
+    </p>
+    <ul>
+      <li>Slowing down near pedestrians</li>
+      <li>Giving priority to moving vehicles</li>
+      <li>Ignoring harmless objects like shadows or signs</li>
+    </ul>
+    <p>
+      This allows the planner to <strong>prioritize safety</strong> and make decisions more like a human driver.
+    </p>
+  
+    <h3>3. Real-Time Implementation</h3>
+    <p>
+      The current setup runs in a simulated offline environment. For a deployable solution, the system can be adapted to 
+      <strong>real-time execution</strong> by:
+    </p>
+    <ul>
+      <li>Optimizing code (e.g., vectorization, parallelism)</li>
+      <li>Leveraging <strong>GPU acceleration</strong></li>
+      <li>Using <strong>ROS (Robot Operating System)</strong> for live data integration</li>
+    </ul>
+    <p>
+      This would allow implementation on real hardware platforms like autonomous robots or vehicles.
+    </p>
+  
+    <h3>4. Sensor Fusion with LiDAR or IMU</h3>
+    <p>
+      Currently, navigation relies only on camera inputs. Adding sensor fusion can enhance reliability:
+    </p>
+    <ul>
+      <li>Fusing <strong>camera + LiDAR</strong> for accurate 3D mapping</li>
+      <li>Using <strong>IMU</strong> for smoother pose estimation</li>
+      <li>Building a <strong>multi-modal perception system</strong></li>
+    </ul>
+    <p>
+      This leads to better performance in complex, real-world environments.
+    </p>
+  
+    <h3>5. Comparison with Other Planning Algorithms</h3>
+    <p>
+      This project uses <strong>ADMM</strong> for trajectory planning. Future enhancements could involve benchmarking against:
+    </p>
+    <ul>
+      <li><strong>Reinforcement learning-based</strong> planners</li>
+      <li><strong>Sampling-based algorithms</strong> like RRT*, A*, PRM</li>
+      <li><strong>Mixed-integer or convex optimization</strong> approaches</li>
+    </ul>
+    <p>
+      This would help evaluate the <strong>efficiency and practicality</strong> of different methods across various scenarios.
+    </p>
+  
+    <hr>
+  
+    <h3>🌐 Final Thought</h3>
+    <p>
+      This project successfully combines perception, tracking, localization, and planning into an intelligent system. 
+      With improvements in sensing, learning, and deployment, it can become a strong base for real-world autonomous vehicles.
+    </p>
+  </section>
+  
+
+  <section id="references" style="padding: 2rem; font-family: Arial, sans-serif;">
+    <h2 style="text-align: center; color: #2c3e50;"> References</h2>
+    <ol style="line-height: 1.8; color: #2c3e50; max-width: 900px; margin: auto;">
+      <li>
+        Mur-Artal, R., Montiel, J. M. M., & Tardós, J. D. (2015). 
+        <i>ORB-SLAM: A Versatile and Accurate Monocular SLAM System</i>. 
+        <a href="https://ieeexplore.ieee.org/document/7353364" target="_blank">IEEE Transactions on Robotics</a>.
+      </li>
+      <li>
+        Bochkovskiy, A., Wang, C. Y., & Liao, H. Y. M. (2020). 
+        <i>YOLOv4: Optimal Speed and Accuracy of Object Detection</i>. 
+        <a href="https://arxiv.org/abs/2004.10934" target="_blank">arXiv:2004.10934</a>.
+      </li>
+      <li>
+        Bewley, A., Ge, Z., Ott, L., Ramos, F., & Upcroft, B. (2016). 
+        <i>Simple Online and Realtime Tracking</i>. 
+        <a href="https://openaccess.thecvf.com/content_iccv_2017/html/Bewley_Simple_Online_and_ICCV_2017_paper.html" target="_blank">ICCV Paper</a>.
+      </li>
+      <li>
+        Geiger, A., Lenz, P., & Urtasun, R. (2012). 
+        <i>The KITTI Vision Benchmark Suite</i>. 
+        <a href="http://www.cvlibs.net/datasets/kitti/" target="_blank">CVPR Dataset Website</a>.
+      </li>
+      <li>
+        Kendall, A., et al. (2017). 
+        <i>End-to-End Learning of Geometry and Context for Deep Stereo Regression</i>. 
+        <a href="https://openaccess.thecvf.com/content_iccv_2017/html/Kendall_End-to-End_Learning_of_ICCV_2017_paper.html" target="_blank">ICCV 2017</a>.
+      </li>
+      <li>
+        Boyd, S., et al. (2011). 
+        <i>Distributed Optimization and Statistical Learning via the Alternating Direction Method of Multipliers</i>. 
+        <a href="https://web.stanford.edu/~boyd/papers/pdf/admm_distr_stats.pdf" target="_blank">Foundations and Trends® in Machine Learning</a>.
+      </li>
+      <li>
+        Ziebart, B. D., et al. (2009). 
+        <i>Planning-Based Prediction for Pedestrians</i>. 
+        <a href="https://ieeexplore.ieee.org/document/5354146" target="_blank">IEEE IROS</a>.
+      </li>
+    </ol>
+  </section>
+  
+
+
+
+
+
+  <footer>
+    <p>&copy; 2025 Your Name | All Rights Reserved</p>
+  </footer>
+
+</body>
+</html>
